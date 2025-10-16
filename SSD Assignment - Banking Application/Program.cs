@@ -8,6 +8,8 @@ namespace Banking_Application
     {
         public static void Main(string[] args)
         {
+
+            //Initial Setup
             
             Data_Access_Layer dal = Data_Access_Layer.getInstance();
             dal.loadBankAccounts();
