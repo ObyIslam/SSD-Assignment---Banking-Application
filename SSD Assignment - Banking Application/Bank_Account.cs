@@ -9,13 +9,13 @@ namespace Banking_Application
     public abstract class Bank_Account
     {
 
-        public String accountNo;
-        public String name;
-        public String address_line_1;
-        public String address_line_2;
-        public String address_line_3;
-        public String town;
-        public double balance;
+        private readonly String accountNo;
+        private readonly String name;
+        private readonly String address_line_1;
+        private readonly String address_line_2;
+        private readonly String address_line_3;
+        private readonly String town;
+        private readonly double balance;
 
         public Bank_Account()
         {

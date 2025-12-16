@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Banking_Application
 {
-    public class Savings_Account: Bank_Account
+    public sealed class Savings_Account: Bank_Account
     {
 
-        public double interestRate;
+       public double interestRate;
 
        public Savings_Account(): base()
         {
