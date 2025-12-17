@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Banking_Application
 {
-    public sealed class Savings_Account: Bank_Account
+    public sealed class Savings_Account: Bank_Account //prevents inheritance
     {
 
        public double interestRate;

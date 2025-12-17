@@ -204,7 +204,7 @@ namespace Banking_Application
 
                         if (ba is null)
                         {
-                            Console.WriteLine("Account Does Not Exist");
+                            Console.WriteLine("Account Does Not Exist");// this shouldnt be said
                         }
                         else
                         {
@@ -242,7 +242,7 @@ namespace Banking_Application
 
                         if(ba is null) 
                         {
-                            Console.WriteLine("Account Does Not Exist");
+                            Console.WriteLine("Account Does Not Exist"); //shouldnt be said
                         }
                         else
                         {
@@ -258,7 +258,7 @@ namespace Banking_Application
 
                         if (ba is null)
                         {
-                            Console.WriteLine("Account Does Not Exist");
+                            Console.WriteLine("Account Does Not Exist"); //shouldnt be said
                         }
                         else
                         {
@@ -297,7 +297,7 @@ namespace Banking_Application
 
                         if (ba is null)
                         {
-                            Console.WriteLine("Account Does Not Exist");
+                            Console.WriteLine("Account Does Not Exist"); //shouldnt be said
                         }
                         else
                         {
