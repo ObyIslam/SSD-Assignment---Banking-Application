@@ -3,9 +3,6 @@ using SSD_Assignment___Banking_Application;
 using System.Runtime.CompilerServices;
 
 
-
-[assembly: DisablePrivateReflection] // Disable private reflection for the entire assembly
-
 namespace Banking_Application
 {
     public class Program
@@ -22,19 +19,25 @@ namespace Banking_Application
 
             string accNo;
             bool running = true;
+            bool validCreds = false;
             bool isGroupMember = false;
             bool isAdminGroupMember = false;
             int loginCount = 0;
 
             // get data from .env file
             string domainName = Environment.GetEnvironmentVariable("DOMAIN_NAME");
-            string groupName = Environment.GetEnvironmentVariable("﻿GROUP_NAME");
-            string adminGroupName = Environment.GetEnvironmentVariable("﻿ADMIN_GROUP_NAME");
+            //string groupName = Environment.GetEnvironmentVariable("﻿GROUP_NAME");
+            //string adminGroupName = Environment.GetEnvironmentVariable("﻿ADMIN_GROUP_NAME");
+
+
+            string groupName = "Bank Teller";
+            string adminGroupName = "BankTellerAdmins";
+
 
             String username = null;
             String password = null;
 
-            while ((loginCount < 3) && (!isAdminGroupMember && !isGroupMember))
+            while (loginCount < 3 && (!validCreds || (!isGroupMember && !isAdminGroupMember)))
             {
                 loginCount++;
                 // get user to log in
@@ -47,7 +50,7 @@ namespace Banking_Application
 
                 // Verify Validity Of User Credentials
                 PrincipalContext domainContext = new PrincipalContext(ContextType.Domain, domainName);
-                bool validCreds = domainContext.ValidateCredentials(username, password);
+                validCreds = domainContext.ValidateCredentials(username, password);
 
                 //Verify Group Membership Of User Account
 
@@ -57,9 +60,17 @@ namespace Banking_Application
 
                 if (userPrincipal != null)
                 {
-                    isGroupMember = userPrincipal.IsMemberOf(domainContext, IdentityType.SamAccountName, groupName);
-                    isAdminGroupMember = userPrincipal.IsMemberOf(domainContext, IdentityType.SamAccountName, adminGroupName);
+                    // Find the groups by their DISPLAY NAME (the name you see in AD)
+                    GroupPrincipal tellerGroup = GroupPrincipal.FindByIdentity(domainContext, IdentityType.Name, "Bank Teller");
+                    GroupPrincipal adminGroup = GroupPrincipal.FindByIdentity(domainContext, IdentityType.Name, "Bank Teller Administrators");
+
+                    if (tellerGroup != null)
+                        isGroupMember = userPrincipal.IsMemberOf(tellerGroup);
+
+                    if (adminGroup != null)
+                        isAdminGroupMember = userPrincipal.IsMemberOf(adminGroup);
                 }
+
 
                 // Encrypt username as it will remain in use
                 username = BitConverter.ToString(cryptography.Encrypt(username));
@@ -123,7 +134,7 @@ namespace Banking_Application
                     switch (option)
                     {
                         case "1":
-                            
+
                             Console.WriteLine("");
                             Console.WriteLine("***Account Types***:");
                             Console.WriteLine("1. Current Account.");
@@ -194,7 +205,7 @@ namespace Banking_Application
                             break;
                         case "2":
                             if (isAdminGroupMember) // only allow deletion if user is an admin
-                            {  
+                            {
 
                                 // Prompt for account number with sanitization and validation
                                 accNo = GetValidAccountNumber("Enter Account Number", "ACCOUNT NUMBER CANNOT BE EMPTY");
@@ -237,9 +248,9 @@ namespace Banking_Application
 
                             }
                             Console.WriteLine("Press any key to continue...");
-                            Console.ReadKey();  
+                            Console.ReadKey();
 
-                            Console.Clear();  
+                            Console.Clear();
                             break;
                         case "3":
 
@@ -249,7 +260,7 @@ namespace Banking_Application
 
                             if (ba is null)
                             {
-                                Console.WriteLine("UNABLE TO PROCESS YOUR REQUEST. PLEASE TRY AGAIN."); 
+                                Console.WriteLine("UNABLE TO PROCESS YOUR REQUEST. PLEASE TRY AGAIN.");
                                 Logger.LogTransaction(username, "n/a", "n/a", "Account Viewing Attempt", DateTime.Now, "Account does not exist", "SSD Banking Application v1.0.0");
 
                             }
@@ -260,7 +271,7 @@ namespace Banking_Application
                                 Logger.LogTransaction(username, BitConverter.ToString(cryptography.Encrypt(ba.AccountNo)), BitConverter.ToString(cryptography.Encrypt(ba.Name)), "Account Viewing", DateTime.Now, "Account Information has been viewed", "SSD Banking Application v1.0.0");
                             }
                             Console.WriteLine("Press any key to continue...");
-                            Console.ReadKey(); 
+                            Console.ReadKey();
 
                             Console.Clear();  // Clears the console after key press
                             break;
@@ -298,11 +309,11 @@ namespace Banking_Application
 
                             if (ba is null)
                             {
-                                Console.WriteLine("UNABLE TO PROCESS YOUR REQUEST. PLEASE TRY AGAIN."); 
+                                Console.WriteLine("UNABLE TO PROCESS YOUR REQUEST. PLEASE TRY AGAIN.");
                                 Logger.LogTransaction(username, "n/a", "n/a", "Withdraw Attempt", DateTime.Now, "Account does not exist", "SSD Banking Application v1.0.0");
                             }
                             else
-                            {                              
+                            {
 
                                 double amountToWithdraw = GetValidDouble($"Enter Amount To Withdraw (€{ba.getAvailableFunds()} Available)", "INVALID AMOUNT ENTERED - PLEASE TRY AGAIN");
 
@@ -331,8 +342,8 @@ namespace Banking_Application
                                 }
                             }
                             Console.WriteLine("Press any key to continue...");
-                            Console.ReadKey();  
-                            Console.Clear();  
+                            Console.ReadKey();
+                            Console.Clear();
                             break;
                         case "6":
                             running = false;
