@@ -6,49 +6,67 @@ using System.Threading.Tasks;
 
 namespace Banking_Application
 {
-    public sealed class Current_Account: Bank_Account //this prevents inheritance
+    public sealed class Current_Account : Bank_Account // marked class as sealed
     {
+        private double overdraftAmount;
 
-        public double overdraftAmount;
-
-        public Current_Account(): base()
+        public Current_Account() : base()
         {
 
         }
-        
+
         public Current_Account(String name, String address_line_1, String address_line_2, String address_line_3, String town, double balance, double overdraftAmount) : base(name, address_line_1, address_line_2, address_line_3, town, balance)
         {
-            this.overdraftAmount = overdraftAmount;
+            OverdraftAmount = overdraftAmount;
+        }
+
+        public double OverdraftAmount
+        {
+            get => overdraftAmount;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Overdraft amount cannot be negative.");
+                overdraftAmount = value;
+            }
         }
 
         public override bool withdraw(double amountToWithdraw)
         {
-            double avFunds = getAvailableFunds();
+            if (amountToWithdraw <= 0)
+                throw new ArgumentException("Withdrawal amount must be positive.");
 
-            if (avFunds >= amountToWithdraw)
+            // Locking the balance to ensure safety during the withdrawal process
+            lock (balanceLock)
             {
-                balance -= amountToWithdraw;
-                return true;
+                double availableFunds = getAvailableFunds();
+
+                if (availableFunds >= amountToWithdraw)
+                {
+                    Balance -= amountToWithdraw;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
-
-            else
-                return false;
-
         }
 
         public override double getAvailableFunds()
         {
-            return (base.balance + overdraftAmount);
+            lock (balanceLock)
+            {
+                return Balance + OverdraftAmount;
+            }
         }
 
-        public override String ToString()
+
+        public override string ToString()
         {
-
             return base.ToString() +
-                "Account Type: Current Account\n" +
-                "Overdraft Amount: " + overdraftAmount + "\n";
-
+                   $"Account Type: Current Account\n" +
+                   $"Overdraft Amount: {OverdraftAmount:C}\n";  
         }
-
     }
 }

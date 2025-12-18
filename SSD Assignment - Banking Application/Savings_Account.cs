@@ -6,48 +6,69 @@ using System.Threading.Tasks;
 
 namespace Banking_Application
 {
-    public sealed class Savings_Account: Bank_Account //prevents inheritance
+    public sealed class Savings_Account : Bank_Account  // marked as sealed
     {
+       
 
-       public double interestRate;
+        private double interestRate;
 
-       public Savings_Account(): base()
+        public Savings_Account() : base()
         {
 
         }
-        
-        public Savings_Account(String name, String address_line_1, String address_line_2, String address_line_3, String town, double balance, double interestRate) : base(name, address_line_1, address_line_2, address_line_3, town, balance)
+
+        public Savings_Account(String accountNo, String name, String address_line_1, String address_line_2, String address_line_3, String town, double balance, double interestRate) : base( name, address_line_1, address_line_2, address_line_3, town, balance)
         {
-            this.interestRate = interestRate;
+            InterestRate = interestRate;
+        }
+
+        public double InterestRate
+        {
+            get => interestRate;
+            set
+            {
+                if (value < 0 || value > 100)
+                    throw new ArgumentException("Interest rate must be between 0 and 100.");
+                interestRate = value;
+            }
         }
         public override double getAvailableFunds()
         {
-            return base.balance;
+            lock (balanceLock)
+            {
+                return Balance; // Thread-safe access to balance
+            }
         }
 
+
+        // Override withdraw with Validation and Thread Safety
         public override bool withdraw(double amountToWithdraw)
         {
-            double avFunds = getAvailableFunds();
+            if (amountToWithdraw <= 0)
+                throw new ArgumentException("Withdrawal amount must be positive.");
 
-            if (avFunds >= amountToWithdraw)
+            lock (balanceLock)
             {
-                balance -= amountToWithdraw;
-                return true;
+                double availableFunds = getAvailableFunds();
+
+                if (availableFunds >= amountToWithdraw)
+                {
+                    Balance -= amountToWithdraw;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
-
-            else
-                return false;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-
-            return base.ToString() + 
-                "Account Type: Savings Account\n" +
-                "Interest Rate: " + interestRate + "\n";
-
+            return base.ToString() +
+                   $"Account Type: Savings Account\n" +
+                   $"Interest Rate: {InterestRate}%\n";
         }
-
 
     }
 }

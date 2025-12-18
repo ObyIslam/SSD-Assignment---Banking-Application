@@ -6,13 +6,6 @@ namespace Banking_Application
 {
     public abstract class Bank_Account
     {
-        //public String accountNo;
-        //public String name;
-        //public String address_line_1;
-        //public String address_line_2;
-        //public String address_line_3;
-        //public String town;
-        //public double balance;
 
         private string accountNo; // better access modifiers
         private string name;
@@ -29,18 +22,18 @@ namespace Banking_Application
             this.accountNo = GenerateAccountNumber();
         }
 
-   
 
-        protected Bank_Account(string? accountNo, string name, string address_line_1, string address_line_2, string address_line_3, string town, double balance)
+        protected Bank_Account(string name, string address_line_1, string address_line_2, string address_line_3, string town, double balance)
         {
-            AccountNo = accountNo ?? GenerateAccountNumber();
-            Name = name;
-            AddressLine1 = address_line_1;
-            AddressLine2 = address_line_2;
-            AddressLine3 = address_line_3;
-            Town = town;
-            Balance = balance;
+            this.accountNo = GenerateAccountNumber();
+            this.name = name;
+            this.address_line_1 = address_line_1;
+            this.address_line_2 = address_line_2;
+            this.address_line_3 = address_line_3;
+            this.town = town;
+            this.balance = balance;
         }
+
         private string GenerateAccountNumber()
         {
             return Guid.NewGuid().ToString();
