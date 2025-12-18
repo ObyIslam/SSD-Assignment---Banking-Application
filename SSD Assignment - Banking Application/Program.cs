@@ -3,6 +3,7 @@ using SSD_Assignment___Banking_Application;
 using System.Runtime.CompilerServices;
 
 
+
 namespace Banking_Application
 {
     public class Program
@@ -24,15 +25,11 @@ namespace Banking_Application
             bool isAdminGroupMember = false;
             int loginCount = 0;
 
+            DotNetEnv.Env.Load();
             // get data from .env file
             string domainName = Environment.GetEnvironmentVariable("DOMAIN_NAME");
-            //string groupName = Environment.GetEnvironmentVariable("﻿GROUP_NAME");
-            //string adminGroupName = Environment.GetEnvironmentVariable("﻿ADMIN_GROUP_NAME");
-
-
-            string groupName = "Bank Teller";
-            string adminGroupName = "BankTellerAdmins";
-
+            string groupName = Environment.GetEnvironmentVariable("GROUP_NAME");
+            string adminGroupName = Environment.GetEnvironmentVariable("ADMIN_GROUP_NAME");
 
             String username = null;
             String password = null;
@@ -46,7 +43,6 @@ namespace Banking_Application
                 password = GetValidInput("Password", "INVALID PASSWORD ENTERED - PLEASE TRY AGAIN");
                 Console.Clear();
 
-                // check if they are authorised
 
                 // Verify Validity Of User Credentials
                 PrincipalContext domainContext = new PrincipalContext(ContextType.Domain, domainName);
@@ -61,8 +57,8 @@ namespace Banking_Application
                 if (userPrincipal != null)
                 {
                     // Find the groups by their DISPLAY NAME (the name you see in AD)
-                    GroupPrincipal tellerGroup = GroupPrincipal.FindByIdentity(domainContext, IdentityType.Name, "Bank Teller");
-                    GroupPrincipal adminGroup = GroupPrincipal.FindByIdentity(domainContext, IdentityType.Name, "Bank Teller Administrators");
+                    GroupPrincipal tellerGroup = GroupPrincipal.FindByIdentity(domainContext, IdentityType.Name, groupName);
+                    GroupPrincipal adminGroup = GroupPrincipal.FindByIdentity(domainContext, IdentityType.Name, adminGroupName);
 
                     if (tellerGroup != null)
                         isGroupMember = userPrincipal.IsMemberOf(tellerGroup);
@@ -121,7 +117,7 @@ namespace Banking_Application
                 do
                 {
                     Console.WriteLine("");
-                    Console.WriteLine("***Banking Application Menu***");
+                    Console.WriteLine("Banking Application Menu");
                     Console.WriteLine("1. Add Bank Account");
                     Console.WriteLine("2. Close Bank Account");
                     Console.WriteLine("3. View Account Information");

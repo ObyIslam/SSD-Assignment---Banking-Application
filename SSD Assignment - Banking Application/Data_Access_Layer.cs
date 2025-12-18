@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Banking_Application;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
+using SSD_Assignment___Banking_Application;
 
 
 namespace Banking_Application
@@ -20,7 +22,7 @@ namespace Banking_Application
         public static String databaseName = "Banking Database.db";
         private static Data_Access_Layer instance = new Data_Access_Layer();
 
-        private Data_Access_Layer()//Singleton Design Pattern (For Concurrency Control) - Use getInstance() Method Instead.
+        private Data_Access_Layer()
         {
             accounts = new List<Bank_Account>();
         }
@@ -66,7 +68,16 @@ namespace Banking_Application
                 ";
 
                 command.ExecuteNonQuery();
-                
+                Logger.LogTransaction(
+                "system",
+                "n/a",
+                "n/a",
+                "Database Init",
+                DateTime.Now,
+                "Database initialised or already exists",
+                "SSD Banking Application v1.0.0"
+                );
+
             }
         }
 
@@ -85,7 +96,7 @@ namespace Banking_Application
                 {
                     int accountType = dr.GetInt16(7);
 
-   
+
                     byte[] accNoBlob = (byte[])dr["accountNo"];
                     byte[] nameBlob = (byte[])dr["name"];
                     byte[] a1Blob = dr["address_line_1"] as byte[];
@@ -182,16 +193,26 @@ namespace Banking_Application
                 }
 
                 command.ExecuteNonQuery();
+                Logger.LogTransaction(
+                "system",
+                BitConverter.ToString(crypto.Encrypt(ba.AccountNo)),
+                BitConverter.ToString(crypto.Encrypt(ba.Name)),
+                "Account Added",
+                DateTime.Now,
+                "New account added to database",
+                "SSD Banking Application v1.0.0"
+                );
+
             }
 
             return ba.AccountNo;
         }
 
 
-        public Bank_Account findBankAccountByAccNo(String accNo) 
-        { 
-        
-            foreach(Bank_Account ba in accounts)
+        public Bank_Account findBankAccountByAccNo(String accNo)
+        {
+
+            foreach (Bank_Account ba in accounts)
             {
 
                 if (ba.AccountNo.Equals(accNo))
@@ -201,7 +222,7 @@ namespace Banking_Application
 
             }
 
-            return null; 
+            return null;
         }
 
         public bool closeBankAccount(string accNo)
@@ -226,6 +247,16 @@ namespace Banking_Application
                 command.Parameters.AddWithValue("@accountNo", crypto.Encrypt(accNo));
 
                 command.ExecuteNonQuery();
+                Logger.LogTransaction(
+                "system",
+                BitConverter.ToString(crypto.Encrypt(accNo)),
+                "n/a",
+                "Account Closed",
+                DateTime.Now,
+                "Account successfully removed from database",
+                "SSD Banking Application v1.0.0"
+                );
+
             }
 
             return true;
@@ -258,6 +289,17 @@ namespace Banking_Application
                 command.Parameters.AddWithValue("@accountNo", crypto.Encrypt(accNo));
 
                 command.ExecuteNonQuery();
+
+                Logger.LogTransaction(
+                "system",
+                BitConverter.ToString(crypto.Encrypt(accNo)),
+                BitConverter.ToString(crypto.Encrypt(ba.Name)),
+                "Lodgement",
+                DateTime.Now,
+                $"Lodged {amountToLodge} to account",
+                "SSD Banking Application v1.0.0"
+                );
+
             }
 
             return true;
@@ -292,6 +334,16 @@ namespace Banking_Application
                 command.Parameters.AddWithValue("@accountNo", crypto.Encrypt(accNo));
 
                 command.ExecuteNonQuery();
+                Logger.LogTransaction(
+                "system",
+                BitConverter.ToString(crypto.Encrypt(accNo)),
+                BitConverter.ToString(crypto.Encrypt(ba.Name)),
+                "Withdrawal",
+                DateTime.Now,
+                $"Withdrew {amountToWithdraw} from account",
+                "SSD Banking Application v1.0.0"
+                );
+
             }
 
             return true;
