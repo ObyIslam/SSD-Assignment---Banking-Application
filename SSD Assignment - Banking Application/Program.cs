@@ -34,7 +34,7 @@ namespace Banking_Application
             String username = null;
             String password = null;
 
-            while (loginCount < 3 && (!validCreds || (!isGroupMember && !isAdminGroupMember)))
+            while (loginCount < maxAttempts && (!validCreds || (!isGroupMember && !isAdminGroupMember)))
             {
                 loginCount++;
                 // get user to log in
@@ -362,20 +362,13 @@ namespace Banking_Application
         {
             const int maxLength = 150; // Hardcoded maximum length
             string input;
-            int attemptCount = 0;
 
             do
             {
-                if (attemptCount >= maxAttempts)
-                {
-                    Console.WriteLine("You have exceeded the maximum number of attempts. Try again later. Application exiting.");
-                    Environment.Exit(0); // Close the application if max attempts are reached
-                }
 
                 Console.Write($"{prompt}: ");
                 input = Console.ReadLine();
 
-                // Trim leading/trailing whitespace
                 input = input?.Trim();
 
                 if (string.IsNullOrEmpty(input))
@@ -388,8 +381,6 @@ namespace Banking_Application
                     input = null; // Reset input to ensure the loop continues
                 }
 
-                // Increment attempt count after each failed attempt
-                attemptCount++;
             } while (string.IsNullOrEmpty(input));
 
             return input;
@@ -407,13 +398,12 @@ namespace Banking_Application
 
             if (!string.IsNullOrEmpty(input))
             {
-                // Trim leading/trailing whitespace
                 input = input.Trim();
 
                 if (input.Length > maxLength)
                 {
                     Console.WriteLine($"INPUT EXCEEDS THE MAXIMUM ALLOWED LENGTH OF {maxLength} CHARACTERS. IT WILL BE TRUNCATED.");
-                    input = input.Substring(0, maxLength); // Truncate to the maximum length
+                    input = input.Substring(0, maxLength);
                 }
 
                 input = SanitizeInput(input);
@@ -428,16 +418,9 @@ namespace Banking_Application
         {
             const int maxLength = 20; // Reasonable maximum length for numeric input
             double value;
-            int attemptCount = 0;
 
             do
             {
-                if (attemptCount >= maxAttempts)
-                {
-                    Console.WriteLine("You have exceeded the maximum number of attempts. Try again later. Application exiting.");
-                    Environment.Exit(0); // Close the application if max attempts are reached
-                }
-
                 Console.Write($"{prompt}: ");
                 string input = Console.ReadLine();
 
@@ -458,7 +441,7 @@ namespace Banking_Application
                 }
 
                 Console.WriteLine(errorMessage);
-                attemptCount++;
+
             } while (true);
         }
 
@@ -467,15 +450,9 @@ namespace Banking_Application
         private static string GetValidOption(string prompt, string[] options)
         {
             string input;
-            int attemptCount = 0;
 
             do
             {
-                if (attemptCount >= maxAttempts)
-                {
-                    Console.WriteLine("You have exceeded the maximum number of attempts. Try again later. Application exiting.");
-                    Environment.Exit(0); // Close the application if max attempts are reached
-                }
 
                 Console.Write($"{prompt}: ");
                 // Read and sanitize the input
@@ -489,7 +466,6 @@ namespace Banking_Application
 
                 // Show error message if the input is invalid
                 Console.WriteLine("INVALID OPTION CHOSEN - PLEASE TRY AGAIN");
-                attemptCount++;
             } while (true);
         }
 
@@ -497,15 +473,9 @@ namespace Banking_Application
         private static string GetValidAccountNumber(string prompt, string errorMessage)
         {
             string accountNumber;
-            int attemptCount = 0;
 
             do
             {
-                if (attemptCount >= maxAttempts)
-                {
-                    Console.WriteLine("You have exceeded the maximum number of attempts. Try again later. Application exiting.");
-                    Environment.Exit(0); // Close the application if max attempts are reached
-                }
 
                 Console.Write($"{prompt}: ");
                 accountNumber = Console.ReadLine()?.Trim(); // Trim any extra spaces
@@ -526,7 +496,7 @@ namespace Banking_Application
                 {
                     Console.WriteLine("INVALID GUID FORMAT. PLEASE ENTER A VALID ACCOUNT NUMBER.");
                 }
-                attemptCount++;
+
             } while (true);
         }
 
